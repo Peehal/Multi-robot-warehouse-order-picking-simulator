@@ -1,0 +1,23 @@
+
+# Project docs kept local, not tracked
+ROADMAP.md
+
+# Build artifacts
+*.exe
+*.o
+*.obj
+*.out
+*.exp
+*.lib
+*.pdb
+
+# Build directories (if you ever add CMake later)
+build/
+out/
+cmake-build-*/
+
+# Editor/IDE clutter
+.vscode/
+*.user
+
+.
