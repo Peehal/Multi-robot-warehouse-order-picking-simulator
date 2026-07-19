@@ -1,11 +1,14 @@
+#include <algorithm>
 #include <iostream>
 #include <memory>
 #include <vector>
 
 #include "BfsPlanner.hpp"
+#include "Order.hpp"
 #include "Robot.hpp"
 #include "Scheduler.hpp"
 #include "SimulationEngine.hpp"
+#include "TaskAssigner.hpp"
 #include "Warehouse.hpp"
 
 using namespace std;
@@ -145,9 +148,62 @@ void runUnreachableGoalScenario() {
                       : "EXPECTED: planRoute correctly reported no path (goal is boxed in)\n");
 }
 
+// Scenario 4 (Phase 2): 3 robots, 4 single-item orders scattered on an open
+// floor. GreedyTaskAssigner pairs each robot with its cheapest remaining
+// order (by Manhattan distance to the item), one order is left unassigned
+// since there are more orders than robots, then Phase 1's Scheduler routes
+// every assigned robot to its item collision-free.
+void runGreedyAssignmentScenario() {
+    cout << "\n========== Scenario 4: greedy task assignment ==========\n";
+
+    sim::Warehouse warehouse(8, 8);
+
+    vector<sim::Robot> robots;
+    robots.emplace_back(0, sim::Position{0, 0});
+    robots.emplace_back(1, sim::Position{7, 0});
+    robots.emplace_back(2, sim::Position{0, 7});
+
+    vector<sim::Order> orders = {
+        sim::Order{100, {sim::Position{1, 1}}},
+        sim::Order{101, {sim::Position{6, 1}}},
+        sim::Order{102, {sim::Position{1, 6}}},
+        sim::Order{103, {sim::Position{4, 4}}},
+    };
+
+    sim::GreedyTaskAssigner assigner;
+    vector<sim::Assignment> assignments = assigner.assign(robots, orders);
+
+    cout << assignments.size() << " of " << orders.size() << " orders assigned:\n";
+    for (const auto& a : assignments) {
+        cout << "  Robot " << a.robotId << " -> Order " << a.orderId << "\n";
+    }
+    if (assignments.size() < orders.size()) {
+        cout << "  (" << (orders.size() - assignments.size())
+             << " order(s) left unassigned -- more orders than robots)\n";
+    }
+
+    const sim::tick_t horizon = 50;
+    sim::Scheduler scheduler(
+        warehouse, unique_ptr<sim::PathPlanner>(new sim::BfsPlanner(horizon)), horizon);
+
+    for (const auto& a : assignments) {
+        auto robotIt = find_if(robots.begin(), robots.end(),
+                                [&](const sim::Robot& r) { return r.id() == a.robotId; });
+        auto orderIt = find_if(orders.begin(), orders.end(),
+                                [&](const sim::Order& o) { return o.id == a.orderId; });
+        bool ok = scheduler.planRoute(*robotIt, orderIt->items.front(), 0);
+        if (!ok) cerr << "Robot " << a.robotId << " could not reach order " << a.orderId << "!\n";
+    }
+
+    sim::SimulationEngine engine(warehouse, robots);
+    engine.run(30, /*verbose=*/true);
+    engine.metrics().print();
+}
+
 int main() {
     runBridgeScenario();
     runHeadOnCorridorScenario();
     runUnreachableGoalScenario();
+    runGreedyAssignmentScenario();
     return 0;
 }
