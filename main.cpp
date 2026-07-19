@@ -8,6 +8,8 @@
 #include "SimulationEngine.hpp"
 #include "Warehouse.hpp"
 
+using namespace std;
+
 // Scenario 1: a single-cell bridge at (2,1) connects the top row to the
 // bottom row. Robot 0 and Robot 1 both need to cross it in opposite
 // directions, which forces the Scheduler's reservation table to make one of
@@ -17,7 +19,7 @@
 //   row1(y=1): # # . # #
 //   row2(y=2): . . . . .
 void runBridgeScenario() {
-    std::cout << "\n========== Scenario 1: single-cell bridge ==========\n";
+    cout << "\n========== Scenario 1: single-cell bridge ==========\n";
 
     sim::Warehouse warehouse(5, 3);
     warehouse.setShelf(0, 1);
@@ -28,14 +30,14 @@ void runBridgeScenario() {
 
     const sim::tick_t horizon = 50;
     sim::Scheduler scheduler(
-        warehouse, std::unique_ptr<sim::PathPlanner>(new sim::BfsPlanner(horizon)), horizon);
+        warehouse, unique_ptr<sim::PathPlanner>(new sim::BfsPlanner(horizon)), horizon);
 
-    std::vector<sim::Robot> robots;
+    vector<sim::Robot> robots;
     robots.emplace_back(0, sim::Position{0, 0});
     robots.emplace_back(1, sim::Position{4, 2});
     robots.emplace_back(2, sim::Position{4, 0});
 
-    std::vector<sim::Position> goals = {
+    vector<sim::Position> goals = {
         sim::Position{0, 2},
         sim::Position{4, 0},
         sim::Position{0, 0},
@@ -45,12 +47,12 @@ void runBridgeScenario() {
     for (size_t i = 0; i < robots.size(); ++i) {
         bool ok = scheduler.planRoute(robots[i], goals[i], 0);
         if (!ok) {
-            std::cerr << "Robot " << robots[i].id() << " could not find a path!\n";
+            cerr << "Robot " << robots[i].id() << " could not find a path!\n";
             allPlanned = false;
         }
     }
     if (!allPlanned) {
-        std::cout << "Scenario infeasible: not all robots could be planned. Skipping run.\n";
+        cout << "Scenario infeasible: not all robots could be planned. Skipping run.\n";
         return;
     }
 
@@ -81,7 +83,7 @@ void runBridgeScenario() {
 //   row0(y=0): . . . . . . .
 //   row1(y=1): # # # # # . #   (passing bay only at column 5)
 void runHeadOnCorridorScenario() {
-    std::cout << "\n========== Scenario 2: head-on corridor with passing bay ==========\n";
+    cout << "\n========== Scenario 2: head-on corridor with passing bay ==========\n";
 
     sim::Warehouse warehouse(7, 2);
     for (int x = 0; x < 7; ++x) {
@@ -90,13 +92,13 @@ void runHeadOnCorridorScenario() {
 
     const sim::tick_t horizon = 50;
     sim::Scheduler scheduler(
-        warehouse, std::unique_ptr<sim::PathPlanner>(new sim::BfsPlanner(horizon)), horizon);
+        warehouse, unique_ptr<sim::PathPlanner>(new sim::BfsPlanner(horizon)), horizon);
 
-    std::vector<sim::Robot> robots;
+    vector<sim::Robot> robots;
     robots.emplace_back(0, sim::Position{0, 0});
     robots.emplace_back(1, sim::Position{6, 0});
 
-    std::vector<sim::Position> goals = {
+    vector<sim::Position> goals = {
         sim::Position{6, 0},
         sim::Position{0, 0},
     };
@@ -105,12 +107,12 @@ void runHeadOnCorridorScenario() {
     for (size_t i = 0; i < robots.size(); ++i) {
         bool ok = scheduler.planRoute(robots[i], goals[i], 0);
         if (!ok) {
-            std::cerr << "Robot " << robots[i].id() << " could not find a path!\n";
+            cerr << "Robot " << robots[i].id() << " could not find a path!\n";
             allPlanned = false;
         }
     }
     if (!allPlanned) {
-        std::cout << "Scenario infeasible: not all robots could be planned. Skipping run.\n";
+        cout << "Scenario infeasible: not all robots could be planned. Skipping run.\n";
         return;
     }
 
@@ -122,7 +124,7 @@ void runHeadOnCorridorScenario() {
 // Scenario 3: goal is fully boxed in by shelves -- planRoute must report
 // failure rather than crash or hang.
 void runUnreachableGoalScenario() {
-    std::cout << "\n========== Scenario 3: unreachable goal ==========\n";
+    cout << "\n========== Scenario 3: unreachable goal ==========\n";
 
     sim::Warehouse warehouse(5, 5);
     warehouse.setShelf(2, 1);
@@ -133,13 +135,13 @@ void runUnreachableGoalScenario() {
 
     const sim::tick_t horizon = 50;
     sim::Scheduler scheduler(
-        warehouse, std::unique_ptr<sim::PathPlanner>(new sim::BfsPlanner(horizon)), horizon);
+        warehouse, unique_ptr<sim::PathPlanner>(new sim::BfsPlanner(horizon)), horizon);
 
-    std::vector<sim::Robot> robots;
+    vector<sim::Robot> robots;
     robots.emplace_back(0, sim::Position{0, 0});
 
     bool ok = scheduler.planRoute(robots[0], sim::Position{2, 2}, 0);
-    std::cout << (ok ? "UNEXPECTED: path was found to a boxed-in cell\n"
+    cout << (ok ? "UNEXPECTED: path was found to a boxed-in cell\n"
                       : "EXPECTED: planRoute correctly reported no path (goal is boxed in)\n");
 }
 

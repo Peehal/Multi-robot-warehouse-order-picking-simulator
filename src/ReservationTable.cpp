@@ -1,5 +1,7 @@
 #include "ReservationTable.hpp"
 
+using namespace std;
+
 namespace sim {
 
 bool ReservationTable::isVertexReserved(Position pos, tick_t t) const {

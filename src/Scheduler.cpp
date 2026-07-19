@@ -1,10 +1,12 @@
 #include "Scheduler.hpp"
 
+using namespace std;
+
 namespace sim {
 
-Scheduler::Scheduler(const Warehouse& warehouse, std::unique_ptr<PathPlanner> planner,
+Scheduler::Scheduler(const Warehouse& warehouse, unique_ptr<PathPlanner> planner,
                       tick_t horizon)
-    : warehouse_(warehouse), planner_(std::move(planner)), horizon_(horizon) {}
+    : warehouse_(warehouse), planner_(move(planner)), horizon_(horizon) {}
 
 bool Scheduler::planRoute(Robot& robot, Position goal, tick_t currentTime) {
     PlanResult result =

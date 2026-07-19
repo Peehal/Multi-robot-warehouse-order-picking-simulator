@@ -4,6 +4,8 @@
 #include <unordered_map>
 #include <unordered_set>
 
+using namespace std;
+
 namespace sim {
 
 namespace {
@@ -16,8 +18,8 @@ struct State {
 
 struct StateHash {
     size_t operator()(const State& s) const noexcept {
-        size_t h = std::hash<Position>()(s.pos);
-        h = h * 31 + std::hash<tick_t>()(s.t);
+        size_t h = hash<Position>()(s.pos);
+        h = h * 31 + hash<tick_t>()(s.t);
         return h;
     }
 };
@@ -38,9 +40,9 @@ PlanResult BfsPlanner::plan(const Warehouse& warehouse, Position start, Position
     static const int dx[5] = {0, 1, -1, 0, 0};
     static const int dy[5] = {0, 0, 0, 1, -1};
 
-    std::queue<State> frontier;
-    std::unordered_map<State, State, StateHash> cameFrom;
-    std::unordered_set<State, StateHash> visited;
+    queue<State> frontier;
+    unordered_map<State, State, StateHash> cameFrom;
+    unordered_set<State, StateHash> visited;
 
     State startState{start, startTime};
     frontier.push(startState);
@@ -83,18 +85,18 @@ PlanResult BfsPlanner::plan(const Warehouse& warehouse, Position start, Position
 
     if (!found) return result;
 
-    std::vector<Position> path;
+    vector<Position> path;
     State cur = goalState;
     while (true) {
         path.push_back(cur.pos);
         if (cur.t == startTime) break;
         cur = cameFrom[cur];
     }
-    std::reverse(path.begin(), path.end());
+    reverse(path.begin(), path.end());
 
     result.found = true;
     result.path.startTime = startTime;
-    result.path.waypoints = std::move(path);
+    result.path.waypoints = move(path);
     return result;
 }
 

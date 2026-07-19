@@ -2,9 +2,11 @@
 
 #include <iostream>
 
+using namespace std;
+
 namespace sim {
 
-SimulationEngine::SimulationEngine(const Warehouse& warehouse, std::vector<Robot>& robots)
+SimulationEngine::SimulationEngine(const Warehouse& warehouse, vector<Robot>& robots)
     : warehouse_(warehouse), robots_(robots) {}
 
 bool SimulationEngine::allDone() const {
@@ -15,7 +17,7 @@ bool SimulationEngine::allDone() const {
 }
 
 void SimulationEngine::printGrid(tick_t t) const {
-    std::cout << "\n-- tick " << t << " --\n";
+    cout << "\n-- tick " << t << " --\n";
     for (int y = 0; y < warehouse_.height(); ++y) {
         for (int x = 0; x < warehouse_.width(); ++x) {
             char ch = '.';
@@ -36,26 +38,26 @@ void SimulationEngine::printGrid(tick_t t) const {
                     break;
                 }
             }
-            std::cout << ch << ' ';
+            cout << ch << ' ';
         }
-        std::cout << "\n";
+        cout << "\n";
     }
 }
 
-void SimulationEngine::checkCollisions(tick_t t, const std::vector<Position>& prevPositions) {
+void SimulationEngine::checkCollisions(tick_t t, const vector<Position>& prevPositions) {
     for (size_t i = 0; i < robots_.size(); ++i) {
         for (size_t j = i + 1; j < robots_.size(); ++j) {
             Position a = robots_[i].position();
             Position b = robots_[j].position();
             if (a == b) {
-                std::cout << "COLLISION at tick " << t << ": robot " << robots_[i].id()
-                          << " and robot " << robots_[j].id() << " both at (" << a.x << ","
-                          << a.y << ")\n";
+                cout << "COLLISION at tick " << t << ": robot " << robots_[i].id()
+                     << " and robot " << robots_[j].id() << " both at (" << a.x << ","
+                     << a.y << ")\n";
                 collisionFree_ = false;
             }
             if (prevPositions[i] == b && prevPositions[j] == a && a != b) {
-                std::cout << "SWAP COLLISION at tick " << t << ": robot " << robots_[i].id()
-                          << " and robot " << robots_[j].id() << " traded cells\n";
+                cout << "SWAP COLLISION at tick " << t << ": robot " << robots_[i].id()
+                     << " and robot " << robots_[j].id() << " traded cells\n";
                 collisionFree_ = false;
             }
         }
@@ -64,7 +66,7 @@ void SimulationEngine::checkCollisions(tick_t t, const std::vector<Position>& pr
 
 void SimulationEngine::run(tick_t maxTicks, bool verbose) {
     for (tick_t t = 0; t <= maxTicks; ++t) {
-        std::vector<Position> prevPositions;
+        vector<Position> prevPositions;
         prevPositions.reserve(robots_.size());
         for (const auto& robot : robots_) prevPositions.push_back(robot.position());
 
@@ -78,9 +80,9 @@ void SimulationEngine::run(tick_t maxTicks, bool verbose) {
     }
     metrics_.computeFrom(robots_);
 
-    std::cout << "\n--- Collision check ---\n";
-    std::cout << (collisionFree_ ? "PASS: no collisions detected across the run.\n"
-                                  : "FAIL: collisions detected, see above.\n");
+    cout << "\n--- Collision check ---\n";
+    cout << (collisionFree_ ? "PASS: no collisions detected across the run.\n"
+                             : "FAIL: collisions detected, see above.\n");
 }
 
 }  // namespace sim

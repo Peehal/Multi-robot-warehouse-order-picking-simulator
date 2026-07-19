@@ -1,5 +1,7 @@
 #include "Robot.hpp"
 
+using namespace std;
+
 namespace sim {
 
 Robot::Robot(int id, Position start) : id_(id), position_(start) {}

@@ -3,9 +3,11 @@
 #include <algorithm>
 #include <iostream>
 
+using namespace std;
+
 namespace sim {
 
-void Metrics::computeFrom(const std::vector<Robot>& robots) {
+void Metrics::computeFrom(const vector<Robot>& robots) {
     perRobotDistance.clear();
     perRobotCompletion.clear();
     makespan = 0;
@@ -21,13 +23,13 @@ void Metrics::computeFrom(const std::vector<Robot>& robots) {
 }
 
 void Metrics::print() const {
-    std::cout << "\n--- Metrics ---\n";
+    cout << "\n--- Metrics ---\n";
     for (size_t i = 0; i < perRobotDistance.size(); ++i) {
-        std::cout << "Robot " << i << ": distance=" << perRobotDistance[i]
-                   << " completedAtTick=" << perRobotCompletion[i] << "\n";
+        cout << "Robot " << i << ": distance=" << perRobotDistance[i]
+             << " completedAtTick=" << perRobotCompletion[i] << "\n";
     }
-    std::cout << "Makespan (ticks): " << makespan << "\n";
-    std::cout << "Total distance across all robots: " << totalDistance << "\n";
+    cout << "Makespan (ticks): " << makespan << "\n";
+    cout << "Total distance across all robots: " << totalDistance << "\n";
 }
 
 }  // namespace sim

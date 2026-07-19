@@ -2,18 +2,20 @@
 
 #include <stdexcept>
 
+using namespace std;
+
 namespace sim {
 
 Warehouse::Warehouse(int width, int height)
     : width_(width), height_(height), grid_(static_cast<size_t>(width * height), CellType::Free) {}
 
 void Warehouse::setShelf(int x, int y) {
-    if (!inBounds(x, y)) throw std::out_of_range("setShelf: position out of bounds");
+    if (!inBounds(x, y)) throw out_of_range("setShelf: position out of bounds");
     grid_[index(x, y)] = CellType::Shelf;
 }
 
 void Warehouse::setStation(int x, int y) {
-    if (!inBounds(x, y)) throw std::out_of_range("setStation: position out of bounds");
+    if (!inBounds(x, y)) throw out_of_range("setStation: position out of bounds");
     grid_[index(x, y)] = CellType::Station;
     station_ = Position{x, y};
 }
